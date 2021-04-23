@@ -1,8 +1,11 @@
 package com.houkunlin.system.applog.starter.mq;
 
 import com.houkunlin.system.applog.starter.AppLogProperties;
+import com.houkunlin.system.applog.starter.store.AppLogStore;
+import com.houkunlin.system.applog.starter.store.RabbitMqAppLogStore;
 import org.springframework.amqp.core.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,5 +53,11 @@ public class AppLogMqConfiguration {
     @Bean
     public Binding appLogBindingExchangeMessage(Queue appLogQueue, TopicExchange appLogExchange) {
         return BindingBuilder.bind(appLogQueue).to(appLogExchange).with(appLogProperties.getMqRoutingKey());
+    }
+
+    @ConditionalOnMissingBean
+    @Bean
+    public AppLogStore appLogStore(final AmqpTemplate amqpTemplate, final AppLogProperties appLogProperties) {
+        return new RabbitMqAppLogStore(amqpTemplate, appLogProperties);
     }
 }

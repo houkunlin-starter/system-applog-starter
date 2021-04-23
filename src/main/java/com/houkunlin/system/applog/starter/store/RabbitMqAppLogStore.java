@@ -5,8 +5,6 @@ import com.houkunlin.system.applog.starter.AppLogProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
@@ -15,8 +13,6 @@ import javax.annotation.PostConstruct;
  *
  * @author HouKunLin
  */
-@ConditionalOnClass(AmqpTemplate.class)
-@Component
 public class RabbitMqAppLogStore implements AppLogStore {
     private static final Logger logger = LoggerFactory.getLogger(RabbitMqAppLogStore.class);
     private final AmqpTemplate amqpTemplate;
