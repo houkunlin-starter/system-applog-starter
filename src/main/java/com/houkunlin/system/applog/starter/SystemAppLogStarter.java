@@ -28,7 +28,7 @@ public class SystemAppLogStarter {
         return new AppLogStore() {
             @Override
             public void store(final AppLogInfo entity) {
-                logger.debug("处理日志： {}", entity);
+                logger.debug("未找到 AppLogStore 处理日志信息，提供一个空的 AppLogStore 对象处理日志： {}", entity);
             }
         };
     }
