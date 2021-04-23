@@ -45,4 +45,12 @@ public Json getUser(){
 
 ### 与其他系统协同，把日志存入其他系统
 
-依赖 Rabbitmq 环境，自行监听 Rabbitmq 消息队列数据，从 `com.houkunlin.system.applog.starter.mq.AppLogConstants#APP_LOG_QUEUE` 队列中获取日志数据
+依赖 Rabbitmq 环境，自行监听 Rabbitmq 消息队列数据，从 `com.houkunlin.system.applog.starter.AppLogProperties.mqQueue` 队列中获取日志数据。
+示例代码
+
+```java
+@RabbitListener(queues = "#{appLogProperties.mqQueue}")
+public void readLog(AppLogInfo info) {
+    logger.info("通过 MQ 获取到日志信息：{}", info);
+}
+```
