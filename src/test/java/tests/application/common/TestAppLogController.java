@@ -1,4 +1,4 @@
-package tests.application;
+package tests.application.common;
 
 import com.houkunlin.system.applog.starter.AppLog;
 import org.springframework.web.bind.annotation.GetMapping;

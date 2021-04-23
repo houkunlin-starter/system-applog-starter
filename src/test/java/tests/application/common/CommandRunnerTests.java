@@ -1,4 +1,4 @@
-package tests.application;
+package tests.application.common;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

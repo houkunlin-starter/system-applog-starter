@@ -22,3 +22,4 @@ logging:
   level:
     com:
       houkunlin: debug
+    tests: debug
