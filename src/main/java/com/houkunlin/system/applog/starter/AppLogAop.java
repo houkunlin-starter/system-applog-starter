@@ -1,0 +1,146 @@
+package com.houkunlin.system.applog.starter;
+
+import com.houkunlin.system.applog.starter.store.AppLogStore;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.EvaluationException;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParseException;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Method;
+
+/**
+ * 操作日志AOP配置
+ *
+ * @author HouKunLin
+ * @date 2020/8/11 0011 16:25
+ */
+@Aspect
+@Component
+public class AppLogAop {
+    private final ExpressionParser parser = new SpelExpressionParser();
+    private final LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
+    private final TemplateParserContext templateParserContext = new TemplateParserContext();
+    private final AppLogStore store;
+
+    public AppLogAop(final AppLogStore store) {
+        this.store = store;
+    }
+
+    @Pointcut("@annotation(AppLog)")
+    public void aop() {
+    }
+
+    @Around("aop()")
+    public Object around(ProceedingJoinPoint pjp) throws Throwable {
+        Method method = getMethod(pjp);
+        Object result = null;
+        Exception exception = null;
+        long start = System.currentTimeMillis();
+        try {
+            result = pjp.proceed();
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        AppLog annotation = method.getAnnotation(AppLog.class);
+        if (annotation != null) {
+            AppLogInfo entity = new AppLogInfo();
+            entity.setDuration(System.currentTimeMillis() - start);
+            entity.setType(annotation.type());
+            entity.setIp(RequestUtil.getRequestIp());
+
+            RootObject rootObject = getRootObject(pjp, method, result, exception);
+            EvaluationContext context = getEvaluationContext(getMethodParameterNames(method), pjp.getArgs(), rootObject);
+
+            entity.setCreatedBy(executeTemplate(annotation.createdBy(), context));
+
+            if (exception == null) {
+                entity.setText(executeTemplate(annotation.value(), context));
+            } else {
+                entity.setExceptionCode(String.valueOf(exception.hashCode()));
+                String messageTpl = annotation.errorValue();
+                if (!StringUtils.hasText(messageTpl)) {
+                    messageTpl = annotation.value() + "；发生了错误：#{e.message}";
+                }
+                entity.setText(executeTemplate(messageTpl, context));
+            }
+            consumerAppLog(entity);
+        }
+
+        if (exception != null) {
+            throw exception;
+        }
+
+        return result;
+    }
+
+    private void consumerAppLog(AppLogInfo entity) {
+        store.store(entity);
+    }
+
+    private RootObject getRootObject(ProceedingJoinPoint pjp, Method method, Object result, Exception e) {
+        return new RootObject(method, pjp.getArgs(), pjp.getTarget(), pjp.getTarget().getClass(), result, e);
+    }
+
+    /**
+     * 解析SPEL
+     *
+     * @param message SpEL表达式
+     * @return 解析结果
+     */
+    private String executeTemplate(String message, EvaluationContext context) {
+        if (message.length() < 5 || !message.contains("#{")) {
+            // 之所以判断小于5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
+            return message;
+        }
+
+        try {
+            return parser.parseExpression(message, templateParserContext).getValue(context, String.class);
+        } catch (EvaluationException | ParseException e) {
+            return message;
+        }
+    }
+
+    private Method getMethod(ProceedingJoinPoint joinPoint) {
+        return ((MethodSignature) joinPoint.getSignature()).getMethod();
+    }
+
+    /**
+     * 获得方法参数名称列表
+     *
+     * @param method 方法对象
+     * @return 方法参数名称列表
+     */
+    private String[] getMethodParameterNames(Method method) {
+        return discoverer.getParameterNames(method);
+    }
+
+    /**
+     * 构建上下文参数
+     *
+     * @param params  方法参数名称列表
+     * @param args    方法参数值列表
+     * @param rootObj 根对象
+     * @return 上下文
+     */
+    private EvaluationContext getEvaluationContext(String[] params, Object[] args, Object rootObj) {
+        final StandardEvaluationContext context = new StandardEvaluationContext(rootObj);
+        if (params != null) {
+            for (int len = 0; len < params.length; len++) {
+                context.setVariable(params[len], args[len]);
+            }
+        }
+        return context;
+    }
+}
