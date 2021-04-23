@@ -32,9 +32,11 @@ public class AppLogAop {
     private final LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
     private final TemplateParserContext templateParserContext = new TemplateParserContext();
     private final AppLogStore store;
+    private final String applicationName;
 
-    public AppLogAop(final AppLogStore store) {
+    public AppLogAop(final AppLogStore store, final AppLogProperties appLogProperties) {
         this.store = store;
+        this.applicationName = appLogProperties.getApplicationName();
     }
 
     @Pointcut("@annotation(AppLog)")
@@ -59,6 +61,7 @@ public class AppLogAop {
             entity.setDuration(System.currentTimeMillis() - start);
             entity.setType(annotation.type());
             entity.setIp(RequestUtil.getRequestIp());
+            entity.setApplicationName(applicationName);
 
             RootObject rootObject = getRootObject(pjp, method, result, exception);
             EvaluationContext context = getEvaluationContext(getMethodParameterNames(method), pjp.getArgs(), rootObject);

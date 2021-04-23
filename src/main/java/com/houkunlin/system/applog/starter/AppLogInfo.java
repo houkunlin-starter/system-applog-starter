@@ -44,4 +44,8 @@ public class AppLogInfo implements Serializable {
      * 操作用户ID
      */
     private String createdBy;
+    /**
+     * 应用名称。记录本条日志来自那个应用服务
+     */
+    private String applicationName;
 }
