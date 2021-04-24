@@ -1,7 +1,9 @@
-package tests.application.server;
+package tests.application.server.rabbitmq;
 
 import com.houkunlin.system.applog.starter.AppLogInfo;
+import com.houkunlin.system.applog.starter.AppLogProperties;
 import com.houkunlin.system.applog.starter.store.AppLogStore;
+import com.houkunlin.system.applog.starter.store.RabbitMqAppLogStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -28,18 +30,8 @@ public class StoreConfiguration {
         logger.info("通过 MQ 获取到日志信息：{}", info);
     }
 
-    /**
-     * 直接提供一个 AppLogStore Bean 对象，使得本系统的应用日志不走 MQ 渠道，而是直接内部处理
-     *
-     * @return AppLogStore
-     */
     @Bean
-    public AppLogStore appLogStore() {
-        return new AppLogStore() {
-            @Override
-            public void store(final AppLogInfo entity) {
-                logger.info("本地直接处理应用日志： {}", entity);
-            }
-        };
+    public AppLogStore appLogStore(final AmqpTemplate amqpTemplate, final AppLogProperties appLogProperties) {
+        return new RabbitMqAppLogStore(amqpTemplate, appLogProperties);
     }
 }

@@ -1,4 +1,4 @@
-package tests.application.server;
+package tests.application.server.local;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,9 +9,9 @@ import tests.application.common.CommandRunnerTests;
  *
  * @author HouKunLin
  */
-@SpringBootApplication(scanBasePackageClasses = {CommandRunnerTests.class, ApplicationServer.class})
-public class ApplicationServer {
+@SpringBootApplication(scanBasePackageClasses = {CommandRunnerTests.class, ApplicationLocalStore.class})
+public class ApplicationLocalStore {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationServer.class);
+        SpringApplication.run(ApplicationLocalStore.class);
     }
 }
