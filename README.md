@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/houkunlin/system-applog-starter.svg)](https://jitpack.io/#houkunlin/system-applog-starter)
+
 # 系统日志 Starter
 
 ## 如何使用
