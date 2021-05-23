@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.TemplateParserContext;
 
 /**
  * 自动配置
@@ -31,5 +33,11 @@ public class SystemAppLogStarter {
                 logger.debug("未找到 AppLogStore 处理日志信息，提供一个空的 AppLogStore 对象处理日志： {}", entity);
             }
         };
+    }
+
+    @ConditionalOnMissingBean
+    @Bean
+    public ParserContext parserContext() {
+        return new TemplateParserContext();
     }
 }

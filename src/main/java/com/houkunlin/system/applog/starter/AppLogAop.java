@@ -13,7 +13,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.expression.*;
-import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.lang.NonNull;
@@ -33,14 +32,22 @@ import java.lang.reflect.Method;
 public class AppLogAop implements BeanFactoryAware, InitializingBean {
     private final ExpressionParser parser = new SpelExpressionParser();
     private final LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
-    private final TemplateParserContext templateParserContext = new TemplateParserContext();
+    private final ParserContext parserContext;
     private final AppLogStore store;
     private final String applicationName;
     private BeanResolver beanResolver;
+    /**
+     * 模板字符串需要的最小长度
+     */
+    private final int spelStrMinLen;
 
-    public AppLogAop(final AppLogStore store, final AppLogProperties appLogProperties) {
+    public AppLogAop(final ParserContext parserContext, final AppLogStore store, final AppLogProperties appLogProperties) {
+        this.parserContext = parserContext;
         this.store = store;
         this.applicationName = appLogProperties.getApplicationName();
+        // 模板字符串最少需要一个前后缀，再加一个变量信息长度，变量信息至少两个字符（#a），不存在只有一个字符的顶级变量
+        // 例如：最小长度为5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
+        this.spelStrMinLen = (parserContext.getExpressionPrefix() + parserContext.getExpressionSuffix()).length() + 2;
     }
 
     @Pointcut("@annotation(AppLog)")
@@ -107,13 +114,12 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
      * @return 解析结果
      */
     private String executeTemplate(String message, EvaluationContext context) {
-        if (message.length() < 5 || !message.contains("#{")) {
-            // 之所以判断小于5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
+        if (message.length() < spelStrMinLen || !message.contains(parserContext.getExpressionPrefix())) {
             return message;
         }
 
         try {
-            return parser.parseExpression(message, templateParserContext).getValue(context, String.class);
+            return parser.parseExpression(message, parserContext).getValue(context, String.class);
         } catch (EvaluationException | ParseException e) {
             e.printStackTrace();
             return message;
