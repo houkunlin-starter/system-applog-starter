@@ -6,6 +6,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -32,6 +34,7 @@ import java.util.Arrays;
 @Aspect
 @Component
 public class AppLogAop implements BeanFactoryAware, InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(AppLogAop.class);
     private final ExpressionParser parser = new SpelExpressionParser();
     private final LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
     private final ParserContext parserContext;
@@ -123,7 +126,8 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
         try {
             return parser.parseExpression(message, parserContext).getValue(context, String.class);
         } catch (EvaluationException | ParseException e) {
-            e.printStackTrace();
+            logger.error("日志 SpEL 解析错误：{}", message);
+            logger.error("SpEL 解析错误", e);
             return message;
         }
     }
