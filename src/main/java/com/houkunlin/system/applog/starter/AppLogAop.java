@@ -17,9 +17,11 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * 操作日志AOP配置
@@ -75,19 +77,19 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
             entity.setApplicationName(applicationName);
 
             RootObject rootObject = getRootObject(pjp, method, result, exception);
-            EvaluationContext context = getEvaluationContext(getMethodParameterNames(method), pjp.getArgs(), rootObject);
+            EvaluationContext context = createEvaluationContext(rootObject, method, pjp.getArgs());
 
-            entity.setCreatedBy(executeTemplate(annotation.createdBy(), context));
+            entity.setCreatedBy(parseExpression(annotation.createdBy(), context));
 
             if (exception == null) {
-                entity.setText(executeTemplate(annotation.value(), context));
+                entity.setText(parseExpression(annotation.value(), context));
             } else {
                 entity.setExceptionCode(String.valueOf(exception.hashCode()));
                 String messageTpl = annotation.errorValue();
                 if (!StringUtils.hasText(messageTpl)) {
                     messageTpl = annotation.value() + "；发生了错误：#{e.message}";
                 }
-                entity.setText(executeTemplate(messageTpl, context));
+                entity.setText(parseExpression(messageTpl, context));
             }
             consumerAppLog(entity);
         }
@@ -113,7 +115,7 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
      * @param message SpEL表达式
      * @return 解析结果
      */
-    private String executeTemplate(String message, EvaluationContext context) {
+    private String parseExpression(String message, EvaluationContext context) {
         if (message.length() < spelStrMinLen || !message.contains(parserContext.getExpressionPrefix())) {
             return message;
         }
@@ -131,29 +133,37 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
     }
 
     /**
-     * 获得方法参数名称列表
-     *
-     * @param method 方法对象
-     * @return 方法参数名称列表
-     */
-    private String[] getMethodParameterNames(Method method) {
-        return discoverer.getParameterNames(method);
-    }
-
-    /**
      * 构建上下文参数
      *
-     * @param params  方法参数名称列表
-     * @param args    方法参数值列表
      * @param rootObj 根对象
+     * @param method  方法对象
+     * @param args    方法参数值列表
      * @return 上下文
      */
-    private EvaluationContext getEvaluationContext(String[] params, Object[] args, Object rootObj) {
+    private EvaluationContext createEvaluationContext(Object rootObj, Method method, Object[] args) {
         final StandardEvaluationContext context = new StandardEvaluationContext(rootObj);
         context.setBeanResolver(beanResolver);
-        if (params != null) {
-            for (int len = 0; len < params.length; len++) {
-                context.setVariable(params[len], args[len]);
+
+        // 参照 org.springframework.context.expression.MethodBasedEvaluationContext.lazyLoadArguments
+        if (!ObjectUtils.isEmpty(args)) {
+            String[] paramNames = discoverer.getParameterNames(method);
+            int paramCount = (paramNames != null ? paramNames.length : method.getParameterCount());
+            int argsCount = args.length;
+
+            for (int i = 0; i < paramCount; i++) {
+                Object value = null;
+                if (argsCount > paramCount && i == paramCount - 1) {
+                    // 将剩余参数公开为最后一个参数的vararg数组
+                    value = Arrays.copyOfRange(args, i, argsCount);
+                } else if (argsCount > i) {
+                    // 找到实际参数-否则保留为null
+                    value = args[i];
+                }
+                context.setVariable("a" + i, value);
+                context.setVariable("p" + i, value);
+                if (paramNames != null && paramNames[i] != null) {
+                    context.setVariable(paramNames[i], value);
+                }
             }
         }
         return context;
