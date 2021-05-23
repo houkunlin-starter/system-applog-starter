@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class TestAppLogController {
-    @AppLog("测试成功日志 - #{result}")
+    @AppLog("测试成功日志 - #{result} , 在什么时候：#{@testBean.now()}")
     @GetMapping("/testLog1")
     public Object testLog1() {
         return "返回信息";

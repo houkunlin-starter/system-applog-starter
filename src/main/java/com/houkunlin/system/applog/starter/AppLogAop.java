@@ -6,14 +6,17 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.EvaluationException;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.ParseException;
+import org.springframework.expression.*;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -27,12 +30,13 @@ import java.lang.reflect.Method;
  */
 @Aspect
 @Component
-public class AppLogAop {
+public class AppLogAop implements BeanFactoryAware, InitializingBean {
     private final ExpressionParser parser = new SpelExpressionParser();
     private final LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
     private final TemplateParserContext templateParserContext = new TemplateParserContext();
     private final AppLogStore store;
     private final String applicationName;
+    private BeanResolver beanResolver;
 
     public AppLogAop(final AppLogStore store, final AppLogProperties appLogProperties) {
         this.store = store;
@@ -111,6 +115,7 @@ public class AppLogAop {
         try {
             return parser.parseExpression(message, templateParserContext).getValue(context, String.class);
         } catch (EvaluationException | ParseException e) {
+            e.printStackTrace();
             return message;
         }
     }
@@ -139,11 +144,22 @@ public class AppLogAop {
      */
     private EvaluationContext getEvaluationContext(String[] params, Object[] args, Object rootObj) {
         final StandardEvaluationContext context = new StandardEvaluationContext(rootObj);
+        context.setBeanResolver(beanResolver);
         if (params != null) {
             for (int len = 0; len < params.length; len++) {
                 context.setVariable(params[len], args[len]);
             }
         }
         return context;
+    }
+
+    @Override
+    public void setBeanFactory(@NonNull final BeanFactory beanFactory) throws BeansException {
+        this.beanResolver = new BeanFactoryResolver(beanFactory);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        assert beanResolver != null;
     }
 }
