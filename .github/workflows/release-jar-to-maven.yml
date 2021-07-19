@@ -6,7 +6,6 @@ name: Release Jar To Maven
 on:
   push:
     tags: [ v* ]
-  workflow_dispatch
 
 jobs:
   build:
