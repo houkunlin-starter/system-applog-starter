@@ -1,8 +1,7 @@
-package com.houkunlin.system.applog.starter.mq;
+package com.houkunlin.system.applog.starter.store;
 
 import com.houkunlin.system.applog.starter.AppLogProperties;
-import com.houkunlin.system.applog.starter.store.AppLogStore;
-import com.houkunlin.system.applog.starter.store.RabbitMqAppLogStore;
+import lombok.AllArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,12 +15,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @ConditionalOnClass(AmqpTemplate.class)
 @Configuration
-public class AppLogMqConfiguration {
+@AllArgsConstructor
+public class AmqpAppLogStoreConfiguration {
     private final AppLogProperties appLogProperties;
-
-    public AppLogMqConfiguration(final AppLogProperties appLogProperties) {
-        this.appLogProperties = appLogProperties;
-    }
 
     /**
      * 配置日志队列
@@ -58,6 +54,6 @@ public class AppLogMqConfiguration {
     @ConditionalOnMissingBean
     @Bean
     public AppLogStore appLogStore(final AmqpTemplate amqpTemplate, final AppLogProperties appLogProperties) {
-        return new RabbitMqAppLogStore(amqpTemplate, appLogProperties);
+        return new AmqpAppLogStore(amqpTemplate, appLogProperties);
     }
 }

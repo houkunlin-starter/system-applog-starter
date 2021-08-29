@@ -1,9 +1,0 @@
-{
-  "groups": [
-    {
-      "sourceType": "com.houkunlin.system.applog.starter.AppLogProperties",
-      "name": "system.applog",
-      "type": "com.houkunlin.system.applog.starter.AppLogProperties"
-    }
-  ]
-}

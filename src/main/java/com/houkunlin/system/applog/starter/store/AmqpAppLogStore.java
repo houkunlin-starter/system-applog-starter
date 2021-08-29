@@ -13,8 +13,8 @@ import javax.annotation.PostConstruct;
  *
  * @author HouKunLin
  */
-public class RabbitMqAppLogStore implements AppLogStore {
-    private static final Logger logger = LoggerFactory.getLogger(RabbitMqAppLogStore.class);
+public class AmqpAppLogStore implements AppLogStore {
+    private static final Logger logger = LoggerFactory.getLogger(AmqpAppLogStore.class);
     private final AmqpTemplate amqpTemplate;
     /**
      * App 日志交换器名称
@@ -25,7 +25,7 @@ public class RabbitMqAppLogStore implements AppLogStore {
      */
     private final String mqRoutingKey;
 
-    public RabbitMqAppLogStore(final AmqpTemplate amqpTemplate, final AppLogProperties appLogProperties) {
+    public AmqpAppLogStore(final AmqpTemplate amqpTemplate, final AppLogProperties appLogProperties) {
         this.amqpTemplate = amqpTemplate;
         this.mqExchange = appLogProperties.getMqExchange();
         this.mqRoutingKey = appLogProperties.getMqRoutingKey();
@@ -40,6 +40,6 @@ public class RabbitMqAppLogStore implements AppLogStore {
 
     @PostConstruct
     public void post() {
-        logger.info("使用 MQ 来通知其他系统存储日志信息");
+        logger.info("使用 AmqpTemplate 来通知其他系统存储日志信息");
     }
 }

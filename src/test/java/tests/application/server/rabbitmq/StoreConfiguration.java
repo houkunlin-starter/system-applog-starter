@@ -3,7 +3,7 @@ package tests.application.server.rabbitmq;
 import com.houkunlin.system.applog.starter.AppLogInfo;
 import com.houkunlin.system.applog.starter.AppLogProperties;
 import com.houkunlin.system.applog.starter.store.AppLogStore;
-import com.houkunlin.system.applog.starter.store.RabbitMqAppLogStore;
+import com.houkunlin.system.applog.starter.store.AmqpAppLogStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -32,6 +32,6 @@ public class StoreConfiguration {
 
     @Bean
     public AppLogStore appLogStore(final AmqpTemplate amqpTemplate, final AppLogProperties appLogProperties) {
-        return new RabbitMqAppLogStore(amqpTemplate, appLogProperties);
+        return new AmqpAppLogStore(amqpTemplate, appLogProperties);
     }
 }
