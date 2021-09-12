@@ -64,7 +64,7 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
         Method method = getMethod(pjp);
         Object result = null;
         Exception exception = null;
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         try {
             result = pjp.proceed();
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
         AppLog annotation = method.getAnnotation(AppLog.class);
         if (annotation != null) {
             AppLogInfo entity = new AppLogInfo();
-            entity.setDuration(System.currentTimeMillis() - start);
+            entity.setDuration((System.nanoTime() - start) / 1000000);
             entity.setType(annotation.type());
             entity.setIp(RequestUtil.getRequestIp());
             entity.setApplicationName(applicationName);
@@ -126,8 +126,9 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
         try {
             return parser.parseExpression(message, parserContext).getValue(context, String.class);
         } catch (EvaluationException | ParseException e) {
-            logger.error("日志 SpEL 解析错误：{}", message);
-            logger.error("SpEL 解析错误", e);
+            if (logger.isErrorEnabled()) {
+                logger.error("应用日志 SpEL 解析错误：" + message, e);
+            }
             return message;
         }
     }

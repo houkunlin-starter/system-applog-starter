@@ -35,7 +35,7 @@ public class AmqpAppLogStoreConfiguration {
      * @return 日志交换器
      */
     @Bean
-    TopicExchange appLogExchange() {
+    public TopicExchange appLogExchange() {
         return new TopicExchange(appLogProperties.getMqExchange());
     }
 
