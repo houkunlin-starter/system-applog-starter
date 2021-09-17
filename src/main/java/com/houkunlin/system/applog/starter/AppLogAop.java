@@ -12,6 +12,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.expression.*;
@@ -40,19 +42,21 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
     private final ParserContext parserContext;
     private final AppLogStore store;
     private final String applicationName;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private BeanResolver beanResolver;
     /**
      * 模板字符串需要的最小长度
      */
     private final int spelStrMinLen;
 
-    public AppLogAop(final ParserContext parserContext, final AppLogStore store, final AppLogProperties appLogProperties) {
+    public AppLogAop(final ParserContext parserContext, @Autowired(required = false) final AppLogStore store, final AppLogProperties appLogProperties, final ApplicationEventPublisher applicationEventPublisher) {
         this.parserContext = parserContext;
         this.store = store;
         this.applicationName = appLogProperties.getApplicationName();
         // 模板字符串最少需要一个前后缀，再加一个变量信息长度，变量信息至少两个字符（#a），不存在只有一个字符的顶级变量
         // 例如：最小长度为5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
         this.spelStrMinLen = (parserContext.getExpressionPrefix() + parserContext.getExpressionSuffix()).length() + 2;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Pointcut("@annotation(AppLog)")
@@ -105,7 +109,10 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
     }
 
     private void consumerAppLog(AppLogInfo entity) {
-        store.store(entity);
+        applicationEventPublisher.publishEvent(new AppLogEvent(entity));
+        if (store != null) {
+            store.store(entity);
+        }
     }
 
     private RootObject getRootObject(ProceedingJoinPoint pjp, Method method, Object result, Exception e) {
