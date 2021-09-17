@@ -1,6 +1,24 @@
 [![](https://jitpack.io/v/houkunlin/system-applog-starter.svg)](https://jitpack.io/#houkunlin/system-applog-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/com.houkunlin/system-applog-starter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.houkunlin%22%20AND%20a:%22system-applog-starter%22)
 
 # 系统日志 Starter
+
+**Maven**
+
+```xml
+<dependency>
+    <groupId>com.houkunlin</groupId>
+    <artifactId>system-applog-starter</artifactId>
+    <version>${latest.version}</version>
+</dependency>
+```
+
+**Gradle**
+
+```groovy
+implementation "com.houkunlin:system-applog-starter:${latest.release}"
+```
+
 
 ## 如何使用
 
@@ -56,3 +74,4 @@ public void readLog(AppLogInfo info) {
     logger.info("通过 MQ 获取到日志信息：{}", info);
 }
 ```
+
