@@ -10,10 +10,10 @@ plugins {
 }
 
 group = 'com.houkunlin'
-version = '1.0.3-BUILD-SNAPSHOT'
+version = '1.0.3'
 sourceCompatibility = '1.8'
 
-def gitRepo = "github.com/houkunlin/system-applog-starter.git"
+def gitRepo = "github.com/houkunlin-starter/system-applog-starter.git"
 def isSnapshot = findProperty("snapshot") != null || version.endsWith('SNAPSHOT')
 
 if (isSnapshot && !version.endsWith('SNAPSHOT')) {
