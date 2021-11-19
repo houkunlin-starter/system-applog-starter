@@ -1,5 +1,6 @@
 package tests.application.common;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +10,9 @@ import org.springframework.stereotype.Component;
  * @author HouKunLin
  */
 @Component
+@RequiredArgsConstructor
 public class CommandRunnerTests implements CommandLineRunner {
     private final TestAppLogController controller;
-
-    public CommandRunnerTests(final TestAppLogController controller) {
-        this.controller = controller;
-    }
 
     @Override
     public void run(final String... args) {
