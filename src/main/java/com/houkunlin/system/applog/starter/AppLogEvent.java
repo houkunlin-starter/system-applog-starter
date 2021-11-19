@@ -1,20 +1,78 @@
 package com.houkunlin.system.applog.starter;
 
+import lombok.Getter;
+import org.slf4j.helpers.MessageFormatter;
 import org.springframework.context.ApplicationEvent;
 
 /**
  * 应用日志事件
  *
  * @author HouKunLin
- * @see 1.0.3
+ * @since 1.0.3
  */
+@Getter
 public class AppLogEvent extends ApplicationEvent {
+    /**
+     * 类似 Slf4J 的日志格式（支持 {} 占位符）
+     *
+     * @since 1.0.4
+     */
+    private final String format;
+    /**
+     * 类似 Slf4J 的日志格式参数信息
+     *
+     * @since 1.0.4
+     */
+    private final transient Object[] argArray;
+
+    private boolean isNotFirst = false;
+
     public AppLogEvent(final AppLogInfo source) {
         super(source);
+        this.format = null;
+        this.argArray = null;
     }
+
+    /**
+     * 构造器
+     *
+     * @param source   日志对象
+     * @param format   类似 Slf4J 的日志格式（支持 {} 占位符）
+     * @param argArray 类似 Slf4J 的日志格式参数信息
+     * @since 1.0.4
+     */
+    public AppLogEvent(final AppLogInfo source, String format, Object... argArray) {
+        super(source);
+        this.format = format;
+        this.argArray = argArray;
+    }
+
 
     @Override
     public AppLogInfo getSource() {
-        return (AppLogInfo) super.getSource();
+        final AppLogInfo logInfo = (AppLogInfo) super.getSource();
+        if (isNotFirst) {
+            return logInfo;
+        }
+        isNotFirst = true;
+        if (argArray != null && argArray.length > 0) {
+            for (int i = 0; i < argArray.length; i++) {
+                final Object item = argArray[i];
+                if (item instanceof Throwable) {
+                    final Throwable throwable = (Throwable) item;
+                    argArray[i] = throwable.getMessage();
+                    logInfo.setExceptionCode(String.valueOf(throwable.hashCode()));
+                }
+            }
+        }
+        if (format == null) {
+            return logInfo;
+        }
+        if (argArray == null) {
+            logInfo.setText(format);
+        } else {
+            logInfo.setText(MessageFormatter.arrayFormat(format, argArray).getMessage());
+        }
+        return logInfo;
     }
 }
