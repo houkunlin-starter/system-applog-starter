@@ -17,6 +17,10 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("system.applog")
 public class AppLogProperties {
     /**
+     * 是否启用 Rabbitmq 传递日志信息
+     */
+    private boolean mqAmqpEnabled = false;
+    /**
      * App 日志交换器名称
      */
     private String mqExchange = "app.topic";

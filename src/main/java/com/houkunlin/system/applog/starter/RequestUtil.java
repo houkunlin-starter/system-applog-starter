@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 public class RequestUtil {
     private static final String[] IP_KEYS = new String[]{"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
     private static final String[] DEFAULT_LOCAL_IP6 = new String[]{"0:0:0:0:0:0:0:1", "::1"};
+
     private RequestUtil() {
     }
 
