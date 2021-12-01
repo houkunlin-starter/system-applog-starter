@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * 日志记录器，提供一种类似 Slf4j 的形式来记录日志信息
@@ -20,6 +23,7 @@ public class AppLoggerFactory {
     private static ApplicationEventPublisher applicationEventPublisher;
     private static ICurrentUser currentUser;
     private static String applicationName;
+    private static final Queue<AppLogEvent> QUEUE = new LinkedList<>();
     /**
      * 日志前缀
      */
@@ -57,6 +61,19 @@ public class AppLoggerFactory {
         return getLogger(clazz.getName());
     }
 
+    @PostConstruct
+    public void post() {
+        if (!QUEUE.isEmpty()) {
+            do {
+                final AppLogEvent event = QUEUE.poll();
+                if (event == null) {
+                    break;
+                }
+                applicationEventPublisher.publishEvent(event);
+            } while (!QUEUE.isEmpty());
+        }
+    }
+
     /**
      * 发起日志事件
      *
@@ -65,9 +82,6 @@ public class AppLoggerFactory {
      * @param argArray   类似 Slf4J 的日志格式参数信息
      */
     public static void logEvent(final String loggerName, String format, Object... argArray) {
-        if (applicationEventPublisher == null) {
-            return;
-        }
         AppLogInfo entity = new AppLogInfo();
         entity.setDuration(0L);
         entity.setType(loggerName);
@@ -76,7 +90,12 @@ public class AppLoggerFactory {
         if (currentUser != null) {
             entity.setCreatedBy(currentUser.currentUserId());
         }
+        final AppLogEvent event = new AppLogEvent(entity, format, argArray);
+        if (applicationEventPublisher == null) {
+            QUEUE.add(event);
+            return;
+        }
 
-        applicationEventPublisher.publishEvent(new AppLogEvent(entity, format, argArray));
+        applicationEventPublisher.publishEvent(event);
     }
 }
