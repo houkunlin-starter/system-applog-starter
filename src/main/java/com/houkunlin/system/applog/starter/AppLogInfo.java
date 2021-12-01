@@ -25,9 +25,13 @@ public class AppLogInfo implements Serializable {
      */
     private String exceptionCode;
     /**
-     * 操作类型（暂未定，自行传入）
+     * 操作类型、业务类型（自行传入，建议使用对象名称，或者对象完整包名）
      */
-    private String type;
+    private String businessType;
+    /**
+     * 操作记录关联的业务ID，通过 {@link #businessType} + businessId 一般情况下可定位到一条相对应的数据信息
+     */
+    private String businessId;
     /**
      * 操作内容
      */

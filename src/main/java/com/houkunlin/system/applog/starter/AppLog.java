@@ -39,11 +39,20 @@ public @interface AppLog {
     String errorValue() default "";
 
     /**
-     * 操作类型（类型需要自行传入）
+     * 操作类型、业务类型（自行传入，建议使用对象名称，或者对象完整包名）；
+     * 支持 SpEL 表达式
      *
      * @return 操作类型。
      */
-    String type() default "";
+    String businessType() default "";
+
+    /**
+     * 操作记录关联的业务ID，通过 {@link #businessType} + businessId 一般情况下可定位到一条相对应的数据信息；
+     * 支持 SpEL 表达式
+     *
+     * @return 操作类型。
+     */
+    String businessId() default "";
 
     /**
      * 日志创建人；支持 SpEL 表达式

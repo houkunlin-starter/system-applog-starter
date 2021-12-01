@@ -19,19 +19,47 @@ public class AppLoggerImpl implements AppLogger {
 
     @Override
     public void log(String msg) {
-        logger.info(msg);
-        AppLoggerFactory.logEvent(loggerName, msg);
+        log(null, msg);
     }
 
     @Override
     public void log(String format, Object... argArray) {
-        logger.info(format, argArray);
-        AppLoggerFactory.logEvent(loggerName, format, argArray);
+        log(null, format, argArray);
     }
 
     @Override
     public void log(String msg, Throwable t) {
-        logger.info(msg, t);
-        AppLoggerFactory.logEvent(loggerName, msg, t);
+        log(null, msg, t);
+    }
+
+    @Override
+    public void log(final String businessId, final String msg) {
+        if (logger.isInfoEnabled()) {
+            logger.info(getMsg(businessId, msg));
+        }
+        AppLoggerFactory.logEvent(businessId, loggerName, msg);
+    }
+
+    @Override
+    public void log(final String businessId, final String format, final Object... argArray) {
+        if (logger.isInfoEnabled()) {
+            logger.info(getMsg(businessId, format), argArray);
+        }
+        AppLoggerFactory.logEvent(businessId, loggerName, format, argArray);
+    }
+
+    @Override
+    public void log(final String businessId, final String msg, final Throwable t) {
+        if (logger.isInfoEnabled()) {
+            logger.info(getMsg(businessId, msg), t);
+        }
+        AppLoggerFactory.logEvent(businessId, loggerName, msg, t);
+    }
+
+    private String getMsg(final String businessId, final String msg) {
+        if (businessId == null) {
+            return msg;
+        }
+        return String.format("businessId=%s；%s", businessId, msg);
     }
 }

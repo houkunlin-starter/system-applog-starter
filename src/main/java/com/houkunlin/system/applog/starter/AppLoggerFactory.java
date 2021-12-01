@@ -81,10 +81,11 @@ public class AppLoggerFactory {
      * @param format     类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray   类似 Slf4J 的日志格式参数信息
      */
-    public static void logEvent(final String loggerName, String format, Object... argArray) {
+    public static void logEvent(final String businessId, final String loggerName, String format, Object... argArray) {
         AppLogInfo entity = new AppLogInfo();
         entity.setDuration(0L);
-        entity.setType(loggerName);
+        entity.setBusinessType(loggerName);
+        entity.setBusinessId(businessId);
         entity.setIp(RequestUtil.getRequestIp());
         entity.setApplicationName(applicationName);
         if (currentUser != null) {

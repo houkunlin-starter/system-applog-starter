@@ -12,7 +12,7 @@ public interface AppLogger {
      *
      * @param msg 常规文本内容
      */
-    void log(String msg);
+    void log(final String msg);
 
     /**
      * 记录日志信息
@@ -20,7 +20,7 @@ public interface AppLogger {
      * @param format   类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray 类似 Slf4J 的日志格式参数信息
      */
-    void log(String format, Object... argArray);
+    void log(final String format, final Object... argArray);
 
     /**
      * 记录日志信息
@@ -28,5 +28,31 @@ public interface AppLogger {
      * @param msg 类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param t   异常信息
      */
-    void log(String msg, Throwable t);
+    void log(final String msg, final Throwable t);
+
+    /**
+     * 记录日志信息
+     *
+     * @param businessId 业务ID，可通过业务业务类型 loggerName 配合业务ID定位到一条唯一的数据
+     * @param msg        常规文本内容
+     */
+    void log(final String businessId, final String msg);
+
+    /**
+     * 记录日志信息
+     *
+     * @param businessId 业务ID，可通过业务业务类型 loggerName 配合业务ID定位到一条唯一的数据
+     * @param format     类似 Slf4J 的日志格式（支持 {} 占位符）
+     * @param argArray   类似 Slf4J 的日志格式参数信息
+     */
+    void log(final String businessId, final String format, final Object... argArray);
+
+    /**
+     * 记录日志信息
+     *
+     * @param businessId 业务ID，可通过业务业务类型 loggerName 配合业务ID定位到一条唯一的数据
+     * @param msg        类似 Slf4J 的日志格式（支持 {} 占位符）
+     * @param t          异常信息
+     */
+    void log(final String businessId, final String msg, final Throwable t);
 }

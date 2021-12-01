@@ -82,7 +82,6 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
         if (annotation != null) {
             AppLogInfo entity = new AppLogInfo();
             entity.setDuration((System.nanoTime() - start) / 1000000);
-            entity.setType(annotation.type());
             entity.setIp(RequestUtil.getRequestIp());
             entity.setApplicationName(applicationName);
 
@@ -94,6 +93,9 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
             } else if (currentUser != null) {
                 entity.setCreatedBy(currentUser.currentUserId());
             }
+
+            entity.setBusinessType(parseExpression(annotation.businessType(), context));
+            entity.setBusinessId(parseExpression(annotation.businessId(), context));
 
             if (exception == null) {
                 entity.setText(parseExpression(annotation.value(), context));
