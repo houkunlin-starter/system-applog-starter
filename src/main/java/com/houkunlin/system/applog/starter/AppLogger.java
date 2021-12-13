@@ -64,6 +64,7 @@ public interface AppLogger {
      * @param newObject  更新后的新数据
      * @param format     类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray   类似 Slf4J 的日志格式参数信息
+     * @since 1.0.5
      */
     void auditLog(final String businessId, final Object oldObject, final Object newObject, final String format, final Object... argArray);
 }

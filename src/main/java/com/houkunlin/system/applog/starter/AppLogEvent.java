@@ -47,7 +47,6 @@ public class AppLogEvent extends ApplicationEvent {
         this.argArray = argArray;
     }
 
-
     @Override
     public AppLogInfo getSource() {
         final AppLogInfo logInfo = (AppLogInfo) super.getSource();

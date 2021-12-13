@@ -10,7 +10,7 @@ import org.javers.core.diff.ListCompareAlgorithm;
  * 应用日志审计事件
  *
  * @author HouKunLin
- * @since 1.0.4
+ * @since 1.0.5
  */
 @Getter
 public class AppLogAuditEvent extends AppLogEvent {
@@ -24,7 +24,7 @@ public class AppLogAuditEvent extends AppLogEvent {
      * @param source   日志对象
      * @param format   类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray 类似 Slf4J 的日志格式参数信息
-     * @since 1.0.4
+     * @since 1.0.5
      */
     public AppLogAuditEvent(final AppLogInfo source, final Object oldObject, final Object newObject, String format, Object... argArray) {
         super(source, format, argArray);

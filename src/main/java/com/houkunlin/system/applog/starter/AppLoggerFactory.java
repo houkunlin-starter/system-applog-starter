@@ -102,6 +102,7 @@ public class AppLoggerFactory {
      * @param loggerName Slf4J 的日志记录器名称
      * @param format     类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray   类似 Slf4J 的日志格式参数信息
+     * @since 1.0.5
      */
     public static void auditLogEvent(final String businessId, final Object oldObject, final Object newObject, final String loggerName, String format, Object... argArray) {
         final AppLogInfo entity = getAppLogInfo(businessId, loggerName);
