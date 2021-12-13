@@ -17,15 +17,15 @@ public class AppLogEvent extends ApplicationEvent {
      *
      * @since 1.0.4
      */
-    private final String format;
+    protected final String format;
     /**
      * 类似 Slf4J 的日志格式参数信息
      *
      * @since 1.0.4
      */
-    private final transient Object[] argArray;
+    protected final transient Object[] argArray;
 
-    private boolean isNotFirst = false;
+    protected boolean isNotFirst = false;
 
     public AppLogEvent(final AppLogInfo source) {
         super(source);
@@ -51,11 +51,17 @@ public class AppLogEvent extends ApplicationEvent {
     @Override
     public AppLogInfo getSource() {
         final AppLogInfo logInfo = (AppLogInfo) super.getSource();
+        if (format == null) {
+            return logInfo;
+        }
+        if (argArray == null) {
+            return logInfo;
+        }
         if (isNotFirst) {
             return logInfo;
         }
         isNotFirst = true;
-        if (argArray != null && argArray.length > 0) {
+        if (argArray.length > 0) {
             for (int i = 0; i < argArray.length; i++) {
                 final Object item = argArray[i];
                 if (item instanceof Throwable) {
@@ -65,14 +71,7 @@ public class AppLogEvent extends ApplicationEvent {
                 }
             }
         }
-        if (format == null) {
-            return logInfo;
-        }
-        if (argArray == null) {
-            logInfo.setText(format);
-        } else {
-            logInfo.setText(MessageFormatter.arrayFormat(format, argArray).getMessage());
-        }
+        logInfo.setText(MessageFormatter.arrayFormat(format, argArray).getMessage());
         return logInfo;
     }
 }

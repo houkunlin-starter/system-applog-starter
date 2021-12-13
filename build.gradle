@@ -45,6 +45,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     api 'com.google.guava:guava:31.0.1-jre'
+    api 'org.javers:javers-core:6.5.2'
 
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'

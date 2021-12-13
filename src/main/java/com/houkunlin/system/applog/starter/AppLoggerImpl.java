@@ -56,10 +56,18 @@ public class AppLoggerImpl implements AppLogger {
         AppLoggerFactory.logEvent(businessId, loggerName, msg, t);
     }
 
+    @Override
+    public void auditLog(final String businessId, final Object oldObject, final Object newObject, final String format, final Object... argArray) {
+        if (logger.isInfoEnabled()) {
+            logger.info(getMsg(businessId, format), argArray);
+        }
+        AppLoggerFactory.auditLogEvent(businessId, oldObject, newObject, loggerName, format, argArray);
+    }
+
     private String getMsg(final String businessId, final String msg) {
         if (businessId == null) {
             return msg;
         }
-        return String.format("businessId=%s；%s", businessId, msg);
+        return String.format("bizId=%s; %s", businessId, msg);
     }
 }
