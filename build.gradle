@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'com.houkunlin'
-version = '1.0.5'// -BUILD-SNAPSHOT
+version = '1.0.5.1'// -BUILD-SNAPSHOT
 sourceCompatibility = '1.8'
 description = """
 使用 AppLog 注解记录日志信息，或者使用 AppLoggerFactory.getLogger(name) 这种类似 Slf4J 的形式记录日志信息。
@@ -45,7 +45,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     api 'com.google.guava:guava:31.0.1-jre'
-    api 'org.javers:javers-core:6.5.2'
+    api 'org.javers:javers-core:6.5.3'
 
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
