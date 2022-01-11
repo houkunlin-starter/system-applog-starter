@@ -19,21 +19,21 @@ public class AppLoggerImpl implements AppLogger {
 
     @Override
     public void log(String msg) {
-        log(null, msg);
+        logBiz(null, msg);
     }
 
     @Override
     public void log(String format, Object... argArray) {
-        log(null, format, argArray);
+        logBiz(null, format, argArray);
     }
 
     @Override
     public void log(String msg, Throwable t) {
-        log(null, msg, t);
+        logBiz(null, msg, t);
     }
 
     @Override
-    public void log(final String businessId, final String msg) {
+    public void logBiz(final String businessId, final String msg) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, msg));
         }
@@ -41,7 +41,7 @@ public class AppLoggerImpl implements AppLogger {
     }
 
     @Override
-    public void log(final String businessId, final String format, final Object... argArray) {
+    public void logBiz(final String businessId, final String format, final Object... argArray) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, format), argArray);
         }
@@ -49,7 +49,7 @@ public class AppLoggerImpl implements AppLogger {
     }
 
     @Override
-    public void log(final String businessId, final String msg, final Throwable t) {
+    public void logBiz(final String businessId, final String msg, final Throwable t) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, msg), t);
         }
