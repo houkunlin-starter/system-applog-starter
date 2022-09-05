@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'com.houkunlin'
-version = '1.0.5.1'// -BUILD-SNAPSHOT
+version = '1.0.6'// -BUILD-SNAPSHOT
 sourceCompatibility = '1.8'
 description = """
 使用 AppLog 注解记录日志信息，或者使用 AppLoggerFactory.getLogger(name) 这种类似 Slf4J 的形式记录日志信息。
