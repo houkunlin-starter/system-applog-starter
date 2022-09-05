@@ -184,6 +184,11 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
                 }
             }
         }
+        try {
+            context.registerFunction("hasText", StringUtils.class.getMethod("hasText", CharSequence.class));
+            context.registerFunction("trimWhitespace", StringUtils.class.getMethod("trimWhitespace", String.class));
+        } catch (NoSuchMethodException ignored) {
+        }
         return context;
     }
 
