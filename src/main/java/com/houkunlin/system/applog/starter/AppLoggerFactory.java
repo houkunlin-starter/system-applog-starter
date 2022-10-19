@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class AppLoggerFactory {
      * @param format     类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray   类似 Slf4J 的日志格式参数信息
      */
-    public static void logEvent(final String businessId, final String loggerName, String format, Object... argArray) {
+    public static void logEvent(final Serializable businessId, final String loggerName, String format, Object... argArray) {
         final AppLogInfo entity = getAppLogInfo(businessId, loggerName);
         final AppLogEvent event = new AppLogEvent(entity, format, argArray);
         if (applicationEventPublisher == null) {
@@ -104,7 +105,7 @@ public class AppLoggerFactory {
      * @param argArray   类似 Slf4J 的日志格式参数信息
      * @since 1.0.5
      */
-    public static void auditLogEvent(final String businessId, final Object oldObject, final Object newObject, final String loggerName, String format, Object... argArray) {
+    public static void auditLogEvent(final Serializable businessId, final Object oldObject, final Object newObject, final String loggerName, String format, Object... argArray) {
         final AppLogInfo entity = getAppLogInfo(businessId, loggerName);
         final AppLogAuditEvent event = new AppLogAuditEvent(entity, oldObject, newObject, format, argArray);
         if (applicationEventPublisher == null) {
@@ -115,7 +116,7 @@ public class AppLoggerFactory {
         applicationEventPublisher.publishEvent(event);
     }
 
-    private static AppLogInfo getAppLogInfo(final String businessId, final String loggerName) {
+    private static AppLogInfo getAppLogInfo(final Serializable businessId, final String loggerName) {
         final AppLogInfo entity = new AppLogInfo();
         entity.setDuration(0L);
         entity.setBusinessType(loggerName);

@@ -2,6 +2,8 @@ package com.houkunlin.system.applog.starter;
 
 import org.slf4j.Logger;
 
+import java.io.Serializable;
+
 /**
  * 日志记录器，提供一种类似 Slf4j 的形式来记录日志信息
  *
@@ -33,7 +35,7 @@ public class AppLoggerImpl implements AppLogger {
     }
 
     @Override
-    public void logBiz(final String businessId, final String msg) {
+    public void logBiz(final Serializable businessId, final String msg) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, msg));
         }
@@ -41,7 +43,7 @@ public class AppLoggerImpl implements AppLogger {
     }
 
     @Override
-    public void logBiz(final String businessId, final String format, final Object... argArray) {
+    public void logBiz(final Serializable businessId, final String format, final Object... argArray) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, format), argArray);
         }
@@ -49,7 +51,7 @@ public class AppLoggerImpl implements AppLogger {
     }
 
     @Override
-    public void logBiz(final String businessId, final String msg, final Throwable t) {
+    public void logBiz(final Serializable businessId, final String msg, final Throwable t) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, msg), t);
         }
@@ -57,14 +59,14 @@ public class AppLoggerImpl implements AppLogger {
     }
 
     @Override
-    public void auditLog(final String businessId, final Object oldObject, final Object newObject, final String format, final Object... argArray) {
+    public void auditLog(final Serializable businessId, final Object oldObject, final Object newObject, final String format, final Object... argArray) {
         if (logger.isInfoEnabled()) {
             logger.info(getMsg(businessId, format), argArray);
         }
         AppLoggerFactory.auditLogEvent(businessId, oldObject, newObject, loggerName, format, argArray);
     }
 
-    private String getMsg(final String businessId, final String msg) {
+    private String getMsg(final Serializable businessId, final String msg) {
         if (businessId == null) {
             return msg;
         }

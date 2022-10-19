@@ -1,5 +1,7 @@
 package com.houkunlin.system.applog.starter;
 
+import java.io.Serializable;
+
 /**
  * 获取当前用户信息
  *
@@ -11,5 +13,5 @@ public interface ICurrentUser {
      *
      * @return 当前登录用户ID
      */
-    String currentUserId();
+    Serializable currentUserId();
 }

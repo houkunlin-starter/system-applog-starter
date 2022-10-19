@@ -1,5 +1,7 @@
 package com.houkunlin.system.applog.starter;
 
+import java.io.Serializable;
+
 /**
  * 日志记录器，提供一种类似 Slf4j 的形式来记录日志信息
  *
@@ -36,7 +38,7 @@ public interface AppLogger {
      * @param businessId 业务ID，可通过业务业务类型 loggerName 配合业务ID定位到一条唯一的数据
      * @param msg        常规文本内容
      */
-    void logBiz(final String businessId, final String msg);
+    void logBiz(final Serializable businessId, final String msg);
 
     /**
      * 记录日志信息
@@ -45,7 +47,7 @@ public interface AppLogger {
      * @param format     类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param argArray   类似 Slf4J 的日志格式参数信息
      */
-    void logBiz(final String businessId, final String format, final Object... argArray);
+    void logBiz(final Serializable businessId, final String format, final Object... argArray);
 
     /**
      * 记录日志信息
@@ -54,7 +56,7 @@ public interface AppLogger {
      * @param msg        类似 Slf4J 的日志格式（支持 {} 占位符）
      * @param t          异常信息
      */
-    void logBiz(final String businessId, final String msg, final Throwable t);
+    void logBiz(final Serializable businessId, final String msg, final Throwable t);
 
     /**
      * 记录审计日志
@@ -66,5 +68,5 @@ public interface AppLogger {
      * @param argArray   类似 Slf4J 的日志格式参数信息
      * @since 1.0.5
      */
-    void auditLog(final String businessId, final Object oldObject, final Object newObject, final String format, final Object... argArray);
+    void auditLog(final Serializable businessId, final Object oldObject, final Object newObject, final String format, final Object... argArray);
 }

@@ -31,7 +31,7 @@ public class AppLogInfo implements Serializable {
     /**
      * 操作记录关联的业务ID，通过 {@link #businessType} + businessId 一般情况下可定位到一条相对应的数据信息
      */
-    private String businessId;
+    private Serializable businessId;
     /**
      * 操作内容
      */
@@ -47,7 +47,7 @@ public class AppLogInfo implements Serializable {
     /**
      * 操作用户ID
      */
-    private String createdBy;
+    private Serializable createdBy;
     /**
      * 应用名称。记录本条日志来自那个应用服务
      */
