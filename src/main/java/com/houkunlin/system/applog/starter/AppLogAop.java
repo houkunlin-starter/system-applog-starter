@@ -14,7 +14,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.expression.BeanFactoryResolver;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.core.StandardReflectionParameterNameDiscoverer;
 import org.springframework.expression.*;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -37,7 +38,7 @@ import java.util.Arrays;
 public class AppLogAop implements BeanFactoryAware, InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(AppLogAop.class);
     private final ExpressionParser parser = new SpelExpressionParser();
-    private final LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
+    private final ParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
     private final ParserContext parserContext;
     private final String applicationName;
     private final ApplicationEventPublisher applicationEventPublisher;

@@ -1,7 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id "io.freefair.lombok" version "6.1.0"
+    id 'org.springframework.boot' version '3.0.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "io.freefair.lombok" version "6.5.1"
     id 'maven-publish'
     id 'signing'
     id 'java-library'
@@ -10,8 +10,8 @@ plugins {
 }
 
 group = 'com.houkunlin'
-version = '1.0.7'// -BUILD-SNAPSHOT
-sourceCompatibility = '1.8'
+version = '1.1.0'// -BUILD-SNAPSHOT
+
 description = """
 使用 AppLog 注解记录日志信息，或者使用 AppLoggerFactory.getLogger(name) 这种类似 Slf4J 的形式记录日志信息。
 需要自行监听 AppLogEvent 事件去保存日志信息。
@@ -40,12 +40,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+    compileOnly 'org.springframework.boot:spring-boot-starter-security'
     compileOnly 'org.springframework.boot:spring-boot-starter-amqp'
     testCompileOnly 'org.springframework.boot:spring-boot-starter-amqp'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
-    api 'com.google.guava:guava:31.0.1-jre'
-    api 'org.javers:javers-core:6.5.3'
+    api 'com.google.guava:guava:31.1-jre'
+    api 'org.javers:javers-core:6.7.1'
 
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'

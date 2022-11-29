@@ -63,8 +63,7 @@ public class AppLogEvent extends ApplicationEvent {
         if (argArray.length > 0) {
             for (int i = 0; i < argArray.length; i++) {
                 final Object item = argArray[i];
-                if (item instanceof Throwable) {
-                    final Throwable throwable = (Throwable) item;
+                if (item instanceof final Throwable throwable) {
                     argArray[i] = throwable.getMessage();
                     logInfo.setExceptionCode(String.valueOf(throwable.hashCode()));
                 }

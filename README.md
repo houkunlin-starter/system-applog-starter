@@ -3,6 +3,8 @@
 
 # 系统日志 Starter
 
+> v1.1.0 起基于 SpringBoot 3.0.0 编译发布，JDK 最低要求 JDK17
+
 **Maven**
 
 ```xml
@@ -74,4 +76,3 @@ public void readLog(AppLogInfo info) {
     logger.info("通过 MQ 获取到日志信息：{}", info);
 }
 ```
-
