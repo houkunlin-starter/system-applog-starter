@@ -1,21 +1,26 @@
 package com.houkunlin.system.applog.starter;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * 请求工具类（获取当前请求的IP地址）
  *
  * @author HouKunLin
- * @date 2020/8/11 0011 15:06
  */
 public class RequestUtil {
-    private static final String[] IP_KEYS = new String[]{"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
+    private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+    private static final String[] IP_KEYS = new String[]{"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP"};
     private static final String[] DEFAULT_LOCAL_IP6 = new String[]{"0:0:0:0:0:0:0:1", "::1"};
+    public static final Pattern IP_PATTERN = Pattern.compile("((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}");
 
     private RequestUtil() {
     }
@@ -26,16 +31,24 @@ public class RequestUtil {
      * @return 请求对象
      */
     public static HttpServletRequest getRequest() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes) {
-            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
+        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof final ServletRequestAttributes servletRequestAttributes) {
             return servletRequestAttributes.getRequest();
         }
         return null;
     }
 
     /**
-     * 获取当前请求的IP
+     * 获得当前请求对象
+     *
+     * @return 请求对象
+     */
+    public static Optional<HttpServletRequest> getRequestOpt() {
+        return Optional.ofNullable(getRequest());
+    }
+
+    /**
+     * 获取当前请求的IP（X-Forwarded-For 有多个IP时只返回第一个IP）
      *
      * @return IP
      */
@@ -48,12 +61,54 @@ public class RequestUtil {
     }
 
     /**
-     * 获取请求的IP
+     * 获取当前请求的IP（X-Forwarded-For 有值时可能存在多个IP信息）
+     *
+     * @return IP
+     */
+    public static String getRequestIps() {
+        HttpServletRequest request = getRequest();
+        if (request != null) {
+            return getRequestIps(request);
+        }
+        return null;
+    }
+
+    /**
+     * 获取当前请求的IP
+     *
+     * @return IP
+     */
+    public static Optional<String> getRequestIpOpt() {
+        return Optional.ofNullable(getRequestIp());
+    }
+
+    /**
+     * 获取当前请求的IP（X-Forwarded-For 有值时可能存在多个IP信息）
+     *
+     * @return IP
+     */
+    public static Optional<String> getRequestIpsOpt() {
+        return Optional.ofNullable(getRequestIps());
+    }
+
+    /**
+     * 获取请求的IP（X-Forwarded-For 有多个IP时只返回第一个IP）
      *
      * @param request 请求对象
      * @return IP
      */
     public static String getRequestIp(HttpServletRequest request) {
+        String ip = getRequestIps(request);
+        return obtainIp(ip);
+    }
+
+    /**
+     * 获取请求的IP（X-Forwarded-For 有值时可能存在多个IP信息）
+     *
+     * @param request 请求对象
+     * @return IP
+     */
+    public static String getRequestIps(HttpServletRequest request) {
         String ip = null;
         boolean hasIp = false;
         for (final String ipKey : IP_KEYS) {
@@ -66,7 +121,10 @@ public class RequestUtil {
         if (!hasIp) {
             ip = request.getRemoteAddr();
         }
-        return obtainIp(ip);
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} {} for proxy ip or real ip: {}", request.getMethod(), request.getRequestURI(), ip);
+        }
+        return ip;
     }
 
     /**
@@ -80,17 +138,27 @@ public class RequestUtil {
     }
 
     /**
-     * 获取IP信息（去除本机的IPv6地址）
+     * 获取IP信息（去除本机的IPv6地址），只取第一个IP信息
      *
-     * @param ip IP内容
+     * @param ip IP内容（有可能是以逗号分隔的字符串）
      * @return IP信息
      */
     private static String obtainIp(String ip) {
+        String realIp = ip;
+        if (realIp.contains(",")) {
+            realIp = ip.split(",")[0];
+        }
         for (final String defaultLocalIp : DEFAULT_LOCAL_IP6) {
-            if (defaultLocalIp.equals(ip)) {
+            if (defaultLocalIp.equals(realIp)) {
                 return "127.0.0.1";
             }
         }
-        return ip;
+        if (IP_PATTERN.matcher(realIp).matches()) {
+            return realIp;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("real ip {} is not ip, return ip 0.0.0.0", realIp);
+        }
+        return "0.0.0.0";
     }
 }
