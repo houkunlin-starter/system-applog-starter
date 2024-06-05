@@ -125,9 +125,23 @@ signing {
 bootJar {
     enabled = false
 }
-
 bootStartScripts {
-    dependsOn('jar')
+    enabled = false
+}
+bootDistTar {
+    enabled = false
+}
+bootDistZip {
+    enabled = false
+}
+startScripts {
+    enabled = false
+}
+distTar {
+    enabled = false
+}
+distZip {
+    enabled = false
 }
 
 idea {
