@@ -4,6 +4,11 @@
 # 系统日志 Starter
 
 > v1.1.0 起基于 SpringBoot 3.0.0 编译发布，JDK 最低要求 JDK17
+>
+> v1.2.0 起基于 SpringBoot 3.3.0 编译发布，JDK 最低要求 JDK17
+>
+> v1.2.0 产生破坏性变更，移除 `AppLogEvent` 事件对象，增加 `AppLogHandler`
+> 处理器对象，包名由 `com.houkunlin.system.applog.starter` 改为 `com.houkunlin.system.applog`
 
 **Maven**
 
@@ -24,7 +29,9 @@ implementation "com.houkunlin:system-applog-starter:${latest.release}"
 
 ## 如何使用
 
-在 Controller 接口中使用 `com.houkunlin.system.applog.starter.AppLog` 注解，示例如下：
+### 在 `Controller` 层使用
+
+在 Controller 接口中使用 `com.houkunlin.system.applog.AppLog` 注解，示例如下：
 
 ```java
 @AppLog("有人获取了用户信息")
@@ -53,22 +60,41 @@ public Json getUser(){
 | type       | String | 操作类型（类型需要自行传入）                                 | 否       |
 | createdBy  | String | 日志创建人                                                   | 是       |
 
+### 在业务代码中的使用示例
 
+示例代码：[src/test/java/com/houkunlin/system/applog/AppLoggerTest.java](src/test/java/com/houkunlin/system/applog/AppLoggerTest.java)
+
+```java
+public class Test {
+    // 获取应用日志对象
+    public static final AppLogger APP_LOGGER = AppLoggerFactory.getLogger("test");
+
+    public void test() {
+        // 像是使用 SLF4j 日志一样调用接口
+        APP_LOGGER.log("Hello World"); // Hello World
+        APP_LOGGER.log("Hello World {}", 12); // Hello World 12
+        APP_LOGGER.log("Hello World {}", new RuntimeException("ERROR")); // Hello World ERROR
+        APP_LOGGER.logBiz("bizId", "Hello World"); // bizId:bizId; Hello World
+        APP_LOGGER.logBiz("bizId", "Hello World {}", 12); // bizId:bizId; Hello World 12
+        APP_LOGGER.logBiz("bizId", "Hello World {}", new RuntimeException("ERROR")); // bizId:bizId; Hello World ERROR
+    }
+}
+```
 
 ## 如何把日志存入到数据库中
 
-日志会封装成 `com.houkunlin.system.applog.starter.AppLogInfo` 对象传给其他系统
+日志会封装成 `com.houkunlin.system.applog.AppLogInfo` 对象传给其他系统
 
 ### 本地存储
 
-实现 `com.houkunlin.system.applog.starter.store.AppLogStore` 接口并扫描到SpringBoot环境中
+实现 `com.houkunlin.system.applog.AppLogHandler` 接口并扫描到SpringBoot环境中，自行实现日志信息存储
 
 
 
 ### 与其他系统协同，把日志存入其他系统
 
-依赖 Rabbitmq 环境，自行监听 Rabbitmq 消息队列数据，从 `com.houkunlin.system.applog.starter.AppLogProperties.mqQueue` 队列中获取日志数据。
-示例代码
+依赖 Rabbitmq 环境，自行监听 Rabbitmq 消息队列数据，从 `com.houkunlin.system.applog.AppLogProperties.mqQueue` 队列中获取日志数据。
+示例代码（仅供参考）
 
 ```java
 @RabbitListener(queues = "#{appLogProperties.mqQueue}")

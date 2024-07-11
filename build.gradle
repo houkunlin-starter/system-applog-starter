@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'com.houkunlin'
-version = '1.2.0-BUILD-SNAPSHOT'// -BUILD-SNAPSHOT
+version = '1.2.0'// -BUILD-SNAPSHOT
 
 description = """
 使用 AppLog 注解记录日志信息，或者使用 AppLoggerFactory.getLogger(name) 这种类似 Slf4J 的形式记录日志信息。
@@ -45,10 +45,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-aop'
     testCompileOnly 'org.springframework.boot:spring-boot-starter-amqp'
-
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    api 'com.google.guava:guava:33.2.1-jre'
-    api 'org.javers:javers-core:6.7.1'
 
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
