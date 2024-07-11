@@ -15,8 +15,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(SecurityContextHolder.class)
 @ConditionalOnMissingBean(ICurrentUser.class)
-public class AutoConfigLogUserConfiguration {
-
+public class SystemAppLogUserConfiguration {
+    /**
+     * 从 Spring Security 读取用户信息
+     *
+     * @return 当前用户
+     */
     @Bean
     public ICurrentUser currentUser() {
         return () -> {

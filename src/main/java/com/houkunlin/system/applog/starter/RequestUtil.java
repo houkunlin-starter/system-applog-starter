@@ -1,8 +1,6 @@
 package com.houkunlin.system.applog.starter;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -16,11 +14,10 @@ import java.util.regex.Pattern;
  *
  * @author HouKunLin
  */
-public class RequestUtil {
-    private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+class RequestUtil {
+    public static final Pattern IP_PATTERN = Pattern.compile("((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}");
     private static final String[] IP_KEYS = new String[]{"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP"};
     private static final String[] DEFAULT_LOCAL_IP6 = new String[]{"0:0:0:0:0:0:0:1", "::1"};
-    public static final Pattern IP_PATTERN = Pattern.compile("((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}");
 
     private RequestUtil() {
     }
@@ -121,9 +118,6 @@ public class RequestUtil {
         if (!hasIp) {
             ip = request.getRemoteAddr();
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} for proxy ip or real ip: {}", request.getMethod(), request.getRequestURI(), ip);
-        }
         return ip;
     }
 
@@ -155,9 +149,6 @@ public class RequestUtil {
         }
         if (IP_PATTERN.matcher(realIp).matches()) {
             return realIp;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("real ip {} is not ip, return ip 0.0.0.0", realIp);
         }
         return "0.0.0.0";
     }

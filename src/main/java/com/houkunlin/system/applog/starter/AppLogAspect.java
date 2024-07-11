@@ -1,9 +1,9 @@
 package com.houkunlin.system.applog.starter;
 
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +11,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.StandardReflectionParameterNameDiscoverer;
@@ -26,50 +24,39 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 操作日志AOP配置
  *
  * @author HouKunLin
- * @date 2020/8/11 0011 16:25
  */
 @Aspect
 @Component
-public class AppLogAop implements BeanFactoryAware, InitializingBean {
-    private static final Logger logger = LoggerFactory.getLogger(AppLogAop.class);
+@RequiredArgsConstructor
+public class AppLogAspect implements BeanFactoryAware, InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(AppLogAspect.class);
     private final ExpressionParser parser = new SpelExpressionParser();
     private final ParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
     private final ParserContext parserContext;
-    private final String applicationName;
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private BeanResolver beanResolver;
-    /**
-     * 模板字符串需要的最小长度
-     */
-    private final int spelStrMinLen;
+    private final AppLogProperties appLogProperties;
+    private final List<AppLogHandler> handlers;
     /**
      * 获取当前登录用户ID
      */
     private final ICurrentUser currentUser;
+    private BeanResolver beanResolver = null;
+    /**
+     * 模板字符串需要的最小长度。
+     * 模板字符串最少需要一个前后缀，再加一个变量信息长度，变量信息至少两个字符（#a），不存在只有一个字符的顶级变量
+     * 例如：最小长度为5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
+     */
+    private int spelStrMinLen = 5;
+    private String applicationName = "";
 
-    public AppLogAop(final ParserContext parserContext, final AppLogProperties appLogProperties, final ApplicationEventPublisher applicationEventPublisher,
-                     @Autowired(required = false) ICurrentUser currentUser) {
-        this.parserContext = parserContext;
-        this.applicationName = appLogProperties.getApplicationName();
-        // 模板字符串最少需要一个前后缀，再加一个变量信息长度，变量信息至少两个字符（#a），不存在只有一个字符的顶级变量
-        // 例如：最小长度为5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
-        this.spelStrMinLen = (parserContext.getExpressionPrefix() + parserContext.getExpressionSuffix()).length() + 2;
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.currentUser = currentUser;
-    }
-
-    @Pointcut("@annotation(AppLog)")
-    public void aop() {
-    }
-
-    @Around("aop()")
-    public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        Method method = getMethod(pjp);
+    @Around("@annotation(annotation)")
+    public Object around(ProceedingJoinPoint pjp, AppLog annotation) throws Throwable {
+        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
         Object result = null;
         Exception exception = null;
         long start = System.nanoTime();
@@ -79,51 +66,39 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
             exception = e;
         }
 
-        AppLog annotation = method.getAnnotation(AppLog.class);
-        if (annotation != null) {
-            AppLogInfo entity = new AppLogInfo();
-            entity.setDuration((System.nanoTime() - start) / 1000000);
-            entity.setIp(RequestUtil.getRequestIp());
-            entity.setApplicationName(applicationName);
+        AppLogInfo entity = new AppLogInfo();
+        entity.setDuration((System.nanoTime() - start) / 1000000);
+        entity.setIp(RequestUtil.getRequestIp());
+        entity.setApplicationName(applicationName);
 
-            RootObject rootObject = getRootObject(pjp, method, result, exception);
-            EvaluationContext context = createEvaluationContext(rootObject, method, pjp.getArgs());
-            final String createdBy = parseExpression(annotation.createdBy(), context);
-            if (StringUtils.hasText(createdBy)) {
-                entity.setCreatedBy(createdBy);
-            } else if (currentUser != null) {
-                entity.setCreatedBy(currentUser.currentUserId());
-            }
-
-            entity.setBusinessType(parseExpression(annotation.businessType(), context));
-            entity.setBusinessId(parseExpression(annotation.businessId(), context));
-
-            if (exception == null) {
-                entity.setText(parseExpression(annotation.value(), context));
-            } else {
-                entity.setExceptionCode(String.valueOf(exception.hashCode()));
-                String messageTpl = annotation.errorValue();
-                if (!StringUtils.hasText(messageTpl)) {
-                    messageTpl = annotation.value() + "；发生了错误：#{e.message}";
-                }
-                entity.setText(parseExpression(messageTpl, context));
-            }
-            consumerAppLog(entity);
+        EvaluationContext context = createEvaluationContext(pjp, method, result, exception);
+        final String createdBy = parseExpression(annotation.createdBy(), context);
+        if (StringUtils.hasText(createdBy)) {
+            entity.setCreatedBy(createdBy);
+        } else if (currentUser != null) {
+            entity.setCreatedBy(currentUser.currentUserId());
         }
+
+        entity.setBusinessType(parseExpression(annotation.businessType(), context));
+        entity.setBusinessId(parseExpression(annotation.businessId(), context));
+
+        if (exception == null) {
+            entity.setText(parseExpression(annotation.value(), context));
+        } else {
+            entity.setExceptionCode(String.valueOf(exception.hashCode()));
+            String messageTpl = annotation.errorValue();
+            if (!StringUtils.hasText(messageTpl)) {
+                messageTpl = annotation.value() + "；发生了错误：#{e.message}";
+            }
+            entity.setText(parseExpression(messageTpl, context));
+        }
+        handlers.forEach(handler -> handler.handle(entity));
 
         if (exception != null) {
             throw exception;
         }
 
         return result;
-    }
-
-    private void consumerAppLog(AppLogInfo entity) {
-        applicationEventPublisher.publishEvent(new AppLogEvent(entity));
-    }
-
-    private RootObject getRootObject(ProceedingJoinPoint pjp, Method method, Object result, Exception e) {
-        return new RootObject(method, pjp.getArgs(), pjp.getTarget(), pjp.getTarget().getClass(), result, e);
     }
 
     /**
@@ -141,28 +116,27 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
             return parser.parseExpression(message, parserContext).getValue(context, String.class);
         } catch (EvaluationException | ParseException e) {
             if (logger.isErrorEnabled()) {
-                logger.error("应用日志 SpEL 解析错误：" + message, e);
+                logger.error("应用日志 SpEL 解析错误：{}", message, e);
             }
             return message;
         }
     }
 
-    private Method getMethod(ProceedingJoinPoint joinPoint) {
-        return ((MethodSignature) joinPoint.getSignature()).getMethod();
-    }
-
     /**
      * 构建上下文参数
      *
-     * @param rootObj 根对象
+     * @param pjp 根对象
      * @param method  方法对象
-     * @param args    方法参数值列表
+     * @param result    请求返回的结果对象
+     * @param exception    请求发生的异常对象
      * @return 上下文
      */
-    private EvaluationContext createEvaluationContext(Object rootObj, Method method, Object[] args) {
-        final StandardEvaluationContext context = new StandardEvaluationContext(rootObj);
+    private EvaluationContext createEvaluationContext(ProceedingJoinPoint pjp, Method method, Object result, Exception exception) {
+        RootObject rootObject = new RootObject(method, pjp.getArgs(), pjp.getTarget(), pjp.getTarget().getClass(), result, exception);
+        final StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
         context.setBeanResolver(beanResolver);
 
+        Object[] args = pjp.getArgs();
         // 参照 org.springframework.context.expression.MethodBasedEvaluationContext.lazyLoadArguments
         if (!ObjectUtils.isEmpty(args)) {
             String[] paramNames = discoverer.getParameterNames(method);
@@ -201,5 +175,9 @@ public class AppLogAop implements BeanFactoryAware, InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         assert beanResolver != null;
+        // 模板字符串最少需要一个前后缀，再加一个变量信息长度，变量信息至少两个字符（#a），不存在只有一个字符的顶级变量
+        // 例如：最小长度为5，是因为一个 SpEL 表达式最少需要 #{#a} 个字符
+        this.spelStrMinLen = (parserContext.getExpressionPrefix() + parserContext.getExpressionSuffix()).length() + 2;
+        this.applicationName = appLogProperties.getApplicationName();
     }
 }

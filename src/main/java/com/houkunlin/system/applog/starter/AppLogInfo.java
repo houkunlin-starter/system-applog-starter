@@ -21,7 +21,7 @@ public class AppLogInfo implements Serializable {
      */
     private final LocalDateTime createdAt = LocalDateTime.now();
     /**
-     * 发生异常时的错误代码
+     * 发生异常时的错误代码（异常的 hashCode 值）
      */
     private String exceptionCode;
     /**
@@ -41,7 +41,7 @@ public class AppLogInfo implements Serializable {
      */
     private String ip;
     /**
-     * 耗时、时长
+     * 耗时、时长（单位：毫秒）
      */
     private Long duration;
     /**

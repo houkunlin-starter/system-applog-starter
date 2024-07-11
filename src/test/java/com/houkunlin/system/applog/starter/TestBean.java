@@ -1,4 +1,4 @@
-package tests.application.common;
+package com.houkunlin.system.applog.starter;
 
 import org.springframework.stereotype.Component;
 
@@ -10,6 +10,6 @@ import java.time.LocalDateTime;
 @Component
 public class TestBean {
     public String now() {
-        return LocalDateTime.now().toString();
+        return "2024-01-01 00:00:00";
     }
 }

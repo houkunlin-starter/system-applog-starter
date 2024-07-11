@@ -3,11 +3,10 @@ package com.houkunlin.system.applog.starter;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 
 /**
  * 应用操作日志配置
@@ -18,7 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 @ConditionalOnClass(AmqpTemplate.class)
 @Configuration
 @AllArgsConstructor
-public class AppLogAmqpConfiguration {
+public class SystemAppLogAmqpConfiguration {
     private final AppLogProperties appLogProperties;
     private final AmqpTemplate amqpTemplate;
 
@@ -54,11 +53,14 @@ public class AppLogAmqpConfiguration {
         return BindingBuilder.bind(appLogQueue).to(appLogExchange).with(appLogProperties.getMqRoutingKey());
     }
 
-    @Async
-    @EventListener
-    public void eventListener(final AppLogEvent event) {
-        amqpTemplate.convertAndSend(appLogProperties.getMqExchange(),
-                appLogProperties.getMqRoutingKey(),
-                event.getSource());
+    /**
+     * 把应用日志信息推送到 RabbitMQ 消息队列
+     *
+     * @return AppLogHandler
+     */
+    @ConditionalOnMissingBean(type = "amqpAppLogHandler")
+    @Bean("amqpAppLogHandler")
+    public AppLogHandler amqpAppLogHandler() {
+        return new AppLogHandlerAmqpImpl(appLogProperties, amqpTemplate);
     }
 }
