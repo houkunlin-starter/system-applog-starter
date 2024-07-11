@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog.starter;
+package com.houkunlin.system.applog;
 
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.core.*;

@@ -1,6 +1,6 @@
-package com.houkunlin.system.applog.starter;
+package com.houkunlin.system.applog;
 
-import com.houkunlin.system.applog.starter.bean.Form;
+import com.houkunlin.system.applog.bean.Form;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

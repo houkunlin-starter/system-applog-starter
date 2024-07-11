@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog.starter.bean;
+package com.houkunlin.system.applog.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog.starter;
+package com.houkunlin.system.applog;
 
 /**
  * 应用日志处理器
