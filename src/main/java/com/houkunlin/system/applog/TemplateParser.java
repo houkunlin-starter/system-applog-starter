@@ -7,7 +7,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
  *
  * @author HouKunLin
  */
-public interface AppLogTemplateParser<CONTEXT> {
+public interface TemplateParser<CONTEXT> {
     /**
      * 创建表达式（模板）上下文对象；构建变量内容
      *
@@ -19,11 +19,19 @@ public interface AppLogTemplateParser<CONTEXT> {
     CONTEXT createContext(ProceedingJoinPoint pjp, Object result, Exception exception);
 
     /**
+     * 判断字符串是否是表达式（模板）内容
+     *
+     * @param template 字符串
+     * @return 结果
+     */
+    boolean isTemplate(String template);
+
+    /**
      * 解析表达式（模板）内容
      *
-     * @param expression 表达式（模板）内容
-     * @param context    上下文对象
+     * @param template 表达式（模板）内容
+     * @param context  上下文对象
      * @return 解析结果
      */
-    String parseExpression(String expression, CONTEXT context);
+    String parseTemplate(String template, CONTEXT context);
 }

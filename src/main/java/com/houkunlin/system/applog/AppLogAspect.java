@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class AppLogAspect implements InitializingBean {
-    private final AppLogTemplateParser appLogTemplateParser;
+    private final TemplateParser templateParser;
     private final AppLogProperties appLogProperties;
     private final List<AppLogHandler> handlers;
     /**
@@ -48,26 +48,26 @@ public class AppLogAspect implements InitializingBean {
         entity.setIp(RequestUtil.getRequestIp());
         entity.setApplicationName(applicationName);
 
-        Object context = appLogTemplateParser.createContext(pjp, result, exception);
-        final String createdBy = appLogTemplateParser.parseExpression(annotation.createdBy(), context);
+        Object context = templateParser.createContext(pjp, result, exception);
+        final String createdBy = templateParser.parseTemplate(annotation.createdBy(), context);
         if (StringUtils.hasText(createdBy)) {
             entity.setCreatedBy(createdBy);
         } else {
             entity.setCreatedBy(currentUser.currentUserId());
         }
 
-        entity.setBusinessType(appLogTemplateParser.parseExpression(annotation.businessType(), context));
-        entity.setBusinessId(appLogTemplateParser.parseExpression(annotation.businessId(), context));
+        entity.setBusinessType(templateParser.parseTemplate(annotation.businessType(), context));
+        entity.setBusinessId(templateParser.parseTemplate(annotation.businessId(), context));
 
         if (exception == null) {
-            entity.setText(appLogTemplateParser.parseExpression(annotation.value(), context));
+            entity.setText(templateParser.parseTemplate(annotation.value(), context));
         } else {
             entity.setExceptionCode(String.valueOf(exception.hashCode()));
             String messageTpl = annotation.errorValue();
             if (!StringUtils.hasText(messageTpl)) {
                 messageTpl = annotation.value() + "；发生了错误：#{e.message}";
             }
-            entity.setText(appLogTemplateParser.parseExpression(messageTpl, context));
+            entity.setText(templateParser.parseTemplate(messageTpl, context));
         }
         handlers.forEach(handler -> {
             try {

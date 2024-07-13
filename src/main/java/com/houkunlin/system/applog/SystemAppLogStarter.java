@@ -28,8 +28,8 @@ public class SystemAppLogStarter {
      */
     @ConditionalOnMissingBean
     @Bean
-    public AppLogTemplateParserDefaultImpl appLogTemplateParser(@Autowired(required = false) ParserContext parserContext) {
-        return new AppLogTemplateParserDefaultImpl(parserContext == null ? new TemplateParserContext() : parserContext);
+    public TemplateParserDefaultImpl appLogTemplateParser(@Autowired(required = false) ParserContext parserContext) {
+        return new TemplateParserDefaultImpl(parserContext == null ? new TemplateParserContext() : parserContext);
     }
 
     /**

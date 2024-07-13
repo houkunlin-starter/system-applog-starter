@@ -28,7 +28,7 @@ import java.util.Arrays;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class AppLogTemplateParserDefaultImpl implements AppLogTemplateParser<EvaluationContext>, BeanFactoryAware, InitializingBean {
+public class TemplateParserDefaultImpl implements TemplateParser<EvaluationContext>, BeanFactoryAware, InitializingBean {
     private final ExpressionParser parser = new SpelExpressionParser();
     private final ParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
     private final ParserContext parserContext;
@@ -92,18 +92,23 @@ public class AppLogTemplateParserDefaultImpl implements AppLogTemplateParser<Eva
     }
 
     @Override
-    public String parseExpression(String expression, EvaluationContext evaluationContext) {
-        if (expression.isBlank() || expression.length() < spelStrMinLen || !expression.contains(parserContext.getExpressionPrefix())) {
-            return expression;
+    public boolean isTemplate(String template) {
+        return !template.isBlank() && template.length() >= spelStrMinLen && template.contains(parserContext.getExpressionPrefix());
+    }
+
+    @Override
+    public String parseTemplate(String template, EvaluationContext evaluationContext) {
+        if (template.isBlank() || template.length() < spelStrMinLen || !template.contains(parserContext.getExpressionPrefix())) {
+            return template;
         }
 
         try {
-            return parser.parseExpression(expression, parserContext).getValue(evaluationContext, String.class);
+            return parser.parseExpression(template, parserContext).getValue(evaluationContext, String.class);
         } catch (EvaluationException | ParseException e) {
             if (log.isErrorEnabled()) {
-                log.error("应用日志 SpEL 解析错误：{}", expression, e);
+                log.error("SpEL 解析错误：{}", template, e);
             }
-            return expression;
+            return template;
         }
     }
 }
