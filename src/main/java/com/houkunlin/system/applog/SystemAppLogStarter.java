@@ -1,6 +1,7 @@
 package com.houkunlin.system.applog;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,14 +21,15 @@ import org.springframework.expression.common.TemplateParserContext;
 @Import(SystemAppLogUserConfiguration.class)
 public class SystemAppLogStarter {
     /**
-     * 提供一个 SpEL 的解析上下文对象
+     * 提供一个默认的应用日志字符串模板处理器
      *
-     * @return ParserContext
+     * @param parserContext SpEL 的解析上下文对象
+     * @return 模板处理器
      */
     @ConditionalOnMissingBean
     @Bean
-    public ParserContext parserContext() {
-        return new TemplateParserContext();
+    public AppLogTemplateParserDefaultImpl appLogTemplateParser(@Autowired(required = false) ParserContext parserContext) {
+        return new AppLogTemplateParserDefaultImpl(parserContext == null ? new TemplateParserContext() : parserContext);
     }
 
     /**
