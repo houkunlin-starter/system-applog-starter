@@ -23,7 +23,7 @@
 **Gradle**
 
 ```groovy
-implementation "com.houkunlin:system-applog-starter:${latest.release}"
+implementation "com.houkunlin:system-applog-starter:${latest.version}"
 ```
 
 
@@ -49,6 +49,10 @@ public Json getUser(){
 - `@AppLog("接口操作说明，当前对象class：#{targetClass.getName()}")`
 - `@AppLog("接口操作说明，返回结果：#{result?.toString()?:'无返回值'}")`
 
+日志内容模板语法可自行定义，自行定义时请实现 [AppLogTemplateParser.java](src%2Fmain%2Fjava%2Fcom%2Fhoukunlin%2Fsystem%2Fapplog%2FAppLogTemplateParser.java)
+接口，
+默认提供的 [AppLogTemplateParserDefaultImpl.java](src%2Fmain%2Fjava%2Fcom%2Fhoukunlin%2Fsystem%2Fapplog%2FAppLogTemplateParserDefaultImpl.java)
+支持 SpEL 表达式（模板）解析。
 
 
 `AppLog` 参数列表：
