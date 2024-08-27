@@ -35,6 +35,6 @@ public class AppLogProperties {
     /**
      * 日志来源应用名称
      */
-    @Value("${spring.application.name}")
-    private String applicationName = "${spring.application.name}";
+    @Value("${spring.application.name:app-server}")
+    private String applicationName = "${spring.application.name:app-server}";
 }

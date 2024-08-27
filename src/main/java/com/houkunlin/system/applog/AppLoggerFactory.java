@@ -1,14 +1,17 @@
 package com.houkunlin.system.applog;
 
+import com.google.common.collect.EvictingQueue;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * 日志记录器，提供一种类似 Slf4j 的形式来记录日志信息
@@ -16,11 +19,11 @@ import java.util.*;
  * @author HouKunLin
  * @since 1.0.4
  */
-@Component
 @RequiredArgsConstructor
 public class AppLoggerFactory implements InitializingBean {
     private static final Map<String, AppLogger> LOGGER_CACHE = new HashMap<>();
-    private static final Queue<AppLogInfo> QUEUE = new LinkedList<>();
+    // 循环队列
+    private static final Queue<AppLogInfo> QUEUE = EvictingQueue.create(100);
     private static ICurrentUser CURRENT_USER;
     private static String APPLICATION_NAME;
     private static List<AppLogHandler> HANDLERS;

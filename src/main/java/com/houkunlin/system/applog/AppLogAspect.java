@@ -18,17 +18,15 @@ import java.util.List;
  */
 @Slf4j
 @Aspect
-@Component
 @RequiredArgsConstructor
-public class AppLogAspect implements InitializingBean {
+public class AppLogAspect {
     private final TemplateParser templateParser;
-    private final AppLogProperties appLogProperties;
     private final List<AppLogHandler> handlers;
     /**
      * 获取当前登录用户ID
      */
     private final ICurrentUser currentUser;
-    private String applicationName = "";
+    private final String applicationName;
 
     @SuppressWarnings({"unchecked"})
     @Around("@annotation(annotation)")
@@ -82,10 +80,5 @@ public class AppLogAspect implements InitializingBean {
         }
 
         return result;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        this.applicationName = appLogProperties.getApplicationName();
     }
 }

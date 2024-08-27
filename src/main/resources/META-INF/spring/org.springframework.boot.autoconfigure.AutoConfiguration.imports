@@ -1,1 +1,4 @@
-com.houkunlin.system.applog.SystemAppLogStarter
+com.houkunlin.system.applog.SystemAppLogAmqpConfiguration
+com.houkunlin.system.applog.SystemAppLogAutoConfiguration
+com.houkunlin.system.applog.SystemAppLogUserConfiguration
+com.houkunlin.system.applog.AppLogProperties

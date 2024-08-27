@@ -36,6 +36,8 @@ repositories {
 }
 
 dependencies {
+    implementation('com.google.guava:guava:33.3.0-jre')
+
     compileOnly 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.springframework.boot:spring-boot-starter-aop'
 
