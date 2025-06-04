@@ -176,7 +176,6 @@ jreleaser {
     }
     release {
         github {
-            name = "system-dict-starter"
             repoOwner = "houkunlin-starter"
             skipTag = true
             overwrite = true
