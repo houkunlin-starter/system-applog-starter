@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog;
+package com.houkunlin.applog;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;

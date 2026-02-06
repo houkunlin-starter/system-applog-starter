@@ -3,19 +3,12 @@
 
 # 系统日志 Starter
 
-> v1.1.0 起基于 SpringBoot 3.0.0 编译发布，JDK 最低要求 JDK17
->
-> v1.2.0 起基于 SpringBoot 3.3.0 编译发布，JDK 最低要求 JDK17
->
-> v1.2.0 产生破坏性变更，移除 `AppLogEvent` 事件对象，增加 `AppLogHandler`
-> 处理器对象，包名由 `com.houkunlin.system.applog.starter` 改为 `com.houkunlin.system.applog`
-
 **Maven**
 
 ```xml
 <dependency>
     <groupId>com.houkunlin</groupId>
-    <artifactId>system-applog-starter</artifactId>
+    <artifactId>system-applog-spring-boot4-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
 ```
@@ -23,7 +16,7 @@
 **Gradle**
 
 ```groovy
-implementation "com.houkunlin:system-applog-starter:${latest.version}"
+implementation "com.houkunlin:system-applog-spring-boot4-starter:${latest.version}"
 ```
 
 
@@ -31,7 +24,7 @@ implementation "com.houkunlin:system-applog-starter:${latest.version}"
 
 ### 在 `Controller` 层使用
 
-在 Controller 接口中使用 `com.houkunlin.system.applog.AppLog` 注解，示例如下：
+在 Controller 接口中使用 `com.houkunlin.applog.AppLog` 注解，示例如下：
 
 ```java
 @AppLog("有人获取了用户信息")
@@ -87,17 +80,17 @@ public class Test {
 
 ## 如何把日志存入到数据库中
 
-日志会封装成 `com.houkunlin.system.applog.AppLogInfo` 对象传给其他系统
+日志会封装成 `com.houkunlin.applog.AppLogInfo` 对象传给其他系统
 
 ### 本地存储
 
-实现 `com.houkunlin.system.applog.AppLogHandler` 接口并扫描到SpringBoot环境中，自行实现日志信息存储
+实现 `com.houkunlin.applog.AppLogHandler` 接口并扫描到SpringBoot环境中，自行实现日志信息存储
 
 
 
 ### 与其他系统协同，把日志存入其他系统
 
-依赖 Rabbitmq 环境，自行监听 Rabbitmq 消息队列数据，从 `com.houkunlin.system.applog.AppLogProperties.mqQueue` 队列中获取日志数据。
+依赖 Rabbitmq 环境，自行监听 Rabbitmq 消息队列数据，从 `com.houkunlin.applog.AppLogProperties.mqQueue` 队列中获取日志数据。
 示例代码（仅供参考）
 
 ```java

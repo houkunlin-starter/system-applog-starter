@@ -1,4 +1,4 @@
-com.houkunlin.system.applog.SystemAppLogAmqpConfiguration
-com.houkunlin.system.applog.SystemAppLogAutoConfiguration
-com.houkunlin.system.applog.SystemAppLogUserConfiguration
-com.houkunlin.system.applog.AppLogProperties
+com.houkunlin.applog.SystemAppLogAmqpConfiguration
+com.houkunlin.applog.SystemAppLogAutoConfiguration
+com.houkunlin.applog.SystemAppLogUserConfiguration
+com.houkunlin.applog.AppLogProperties

@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog;
+package com.houkunlin.applog;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

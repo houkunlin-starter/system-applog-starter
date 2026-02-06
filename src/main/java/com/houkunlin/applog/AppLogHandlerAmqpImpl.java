@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog;
+package com.houkunlin.applog;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;

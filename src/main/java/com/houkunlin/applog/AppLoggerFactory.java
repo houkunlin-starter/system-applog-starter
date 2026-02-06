@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog;
+package com.houkunlin.applog;
 
 import com.google.common.collect.EvictingQueue;
 import jakarta.annotation.PostConstruct;

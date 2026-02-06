@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog;
+package com.houkunlin.applog;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

@@ -1,4 +1,4 @@
-package com.houkunlin.system.applog;
+package com.houkunlin.applog;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 

@@ -5,4 +5,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'system-applog-starter'
+rootProject.name = 'system-applog-spring-boot4-starter'
